@@ -15,7 +15,6 @@ module Producer
 
     define_macro :deploy do
       app_path = get :app_path
-      $app_path = app_path
 
       if ENV.key? 'DEPLOY_INIT'
         ensure_dir      app_path, 0701
