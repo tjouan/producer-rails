@@ -61,14 +61,13 @@ module Producer
     end
 
     define_macro :app_init do |path, dirs: []|
-      directories = (%w[tmp tmp/run] + dirs).map do |e|
-        File.join(path, e)
-      end
+      run_dir = "#{path}/tmp/run"
+      dirs.map! { |e| File.join(path, e) }
 
-      condition { no_dir? directories.first }
+      condition { no_dir? run_dir }
 
-      directories.each { |e| mkdir e, 0700 }
-      sh "cd #{path} && chmod 701 tmp tmp/run"
+      mkdir run_dir, 0701
+      dirs.each { |e| mkdir e, 0700 }
     end
 
     define_macro :db_config do |path|
