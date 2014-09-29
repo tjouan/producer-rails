@@ -37,7 +37,7 @@ module Producer
       www_pid_path  = get :www_pid_path
       queue_workers = get :queue_workers
 
-      if ENV.key? 'DEPLOY_INIT' || ENV.key? 'DEPLOY_START'
+      if ENV.key?('DEPLOY_INIT') || ENV.key?('DEPLOY_START')
         www_start app_path, www_pid_path
         app_start app_path, queue_workers
       else
