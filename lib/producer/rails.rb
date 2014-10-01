@@ -29,6 +29,7 @@ module Producer
         git_update      app_path
         bundle_install  app_path
         db_migrate      app_path
+        db_seed         app_path if (get :db_seed rescue false)
       end
 
       assets_update app_path
@@ -98,6 +99,10 @@ production:
       condition { sh "cd #{path} && bundle exec rake db:migrate:status | grep -E '^ +down'" }
 
       sh "cd #{path} && bundle exec rake db:migrate"
+    end
+
+    define_macro :db_seed do |path|
+      sh "cd #{path} && bundle exec rake db:seed"
     end
 
     define_macro :secrets_init do |path|
