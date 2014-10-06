@@ -70,6 +70,7 @@ module Producer
 
     define_macro :app_init do |path, dirs: []|
       run_dir = "#{path}/tmp/run"
+      dirs << 'public/assets'
       dirs.map! { |e| File.join(path, e) }
 
       condition { no_dir? run_dir }
