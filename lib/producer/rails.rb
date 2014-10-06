@@ -13,21 +13,27 @@ module Producer
       end
     end
 
+    UNICORN_CONF_PATH     = 'config/unicorn.rb'.freeze
+    WWW_PID_PATH          = 'tmp/run/www.pid'.freeze
+    WWW_SOCK_PATH         = 'tmp/run/www.socke'.freeze
+    BUNDLER_UNSET_GROUPS  = %w[development test].freeze
+
     define_macro :deploy do
-      app_path = get :app_path
+      app_path      = get :app_path
+      bundler_unset = (get :bundler_unset rescue []) + BUNDLER_UNSET_GROUPS
 
       if ENV.key? 'DEPLOY_INIT'
         ensure_dir      app_path, 0701
         git_clone       get(:repository), app_path
-        app_init        app_path, get(:app_mkdir)
-        bundle_install  app_path
+        app_init        app_path, (get :app_mkdir rescue [])
         db_config       app_path
+        bundle_install  app_path, bundler_unset
         db_init         app_path
         secrets_init    app_path
         www_config      app_path
       else
         git_update      app_path
-        bundle_install  app_path
+        bundle_install  app_path, bundler_unset
         db_migrate      app_path
         db_seed         app_path if (get :db_seed rescue false)
       end
@@ -35,17 +41,17 @@ module Producer
       assets_update app_path
 
 
-      www_pid_path  = get :www_pid_path
-      queue_workers = get :queue_workers
+      www_pid_path  = (get :www_pid_path rescue WWW_PID_PATH)
+      queue_workers = (get :queue_workers rescue nil)
 
       if ENV.key?('DEPLOY_INIT') || ENV.key?('DEPLOY_START')
         www_start app_path, www_pid_path
-        app_start app_path, queue_workers
+        app_start app_path, queue_workers if queue_workers
       else
         app_stop
         www_stop  app_path, www_pid_path
         www_start app_path, www_pid_path
-        app_start app_path, queue_workers
+        app_start app_path, queue_workers if queue_workers
       end
     end
 
@@ -53,12 +59,13 @@ module Producer
       no_sh "bundle check #{gemfile}"
     end
 
-    define_macro :bundle_install do |path|
+    define_macro :bundle_install do |path, unset_groups|
       gemfile = "--gemfile #{path}/Gemfile"
+      groups  = unset_groups.join ' '
 
       condition { bundle_installed? gemfile }
 
-      sh "bundle install --without development test #{gemfile}"
+      sh "bundle install --without #{groups} #{gemfile}"
     end
 
     define_macro :app_init do |path, dirs: []|
@@ -118,12 +125,15 @@ production:
     end
 
     define_macro :www_config do |path|
-      www_config_path = File.join(path, get(:www_config_path))
+      www_config_path = File.join(
+        path,
+        (get :www_config_path rescue UNICORN_CONF_PATH)
+      )
       conf = <<-eoh
 worker_processes  #{get :www_workers}
 preload_app       false
 pid               '#{get :www_pid_path}'
-listen            "\#{ENV['HOME']}/#{path}/#{get :www_sock_path}"
+listen            "\#{ENV['HOME']}/#{path}/#{(get :www_sock_path rescue WWW_SOCK_PATH)}"
       eoh
 
       condition { no_file_contains www_config_path, conf }
