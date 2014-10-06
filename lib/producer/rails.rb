@@ -25,7 +25,9 @@ module Producer
       if ENV.key? 'DEPLOY_INIT'
         ensure_dir      app_path, 0701
         git_clone       get(:repository), app_path
-        app_init        app_path, (get :app_mkdir rescue [])
+        app_init        app_path,
+          dirs:   (get :app_mkdir rescue []),
+          files:  (get :app_mkfile rescue [])
         db_config       app_path
         bundle_install  app_path, bundler_unset
         db_init         app_path
@@ -68,15 +70,19 @@ module Producer
       sh "bundle install --without #{groups} #{gemfile}"
     end
 
-    define_macro :app_init do |path, dirs: []|
+    define_macro :app_init do |path, dirs: [], files: {}|
       run_dir = "#{path}/tmp/run"
       dirs << 'public/assets'
       dirs.map! { |e| File.join(path, e) }
+      files = files.each_with_object({}) do |(k, v), m|
+        m[File.join(path, k)] = v
+      end
 
       condition { no_dir? run_dir }
 
       mkdir run_dir, 0701
-      dirs.each { |e| mkdir e, 0700 }
+      dirs.each   { |e| mkdir e, 0700 }
+      files.each  { |k, v| file_write k, v, 0600 }
     end
 
     define_macro :db_config do |path|
