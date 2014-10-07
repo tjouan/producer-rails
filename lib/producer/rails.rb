@@ -50,7 +50,7 @@ module Producer
         www_start app_path, www_pid_path
         app_start app_path, queue_workers if queue_workers
       else
-        app_stop
+        app_stop if queue_workers
         www_stop  app_path, www_pid_path
         www_start app_path, www_pid_path
         app_start app_path, queue_workers if queue_workers
