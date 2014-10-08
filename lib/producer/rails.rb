@@ -44,7 +44,7 @@ module Producer
         dirs:   (get :app_mkdir rescue []),
         files:  (get :app_mkfile rescue [])
       db_config       app_path
-      bundle_install  app_path, (get :bundler_unset rescue []) + BUNDLER_UNSET_GROUPS
+      bundle_install  app_path, (get :bundler_unset rescue [])
       db_init         app_path
       secrets_init    app_path
       www_config      app_path
@@ -92,13 +92,13 @@ module Producer
       no_sh "bundle check #{gemfile}"
     end
 
-    define_macro :bundle_install do |path, unset_groups|
+    define_macro :bundle_install do |path, remove_groups = []|
       gemfile = "--gemfile #{path}/Gemfile"
-      groups  = unset_groups.join ' '
+      without_groups = (remove_groups + BUNDLER_UNSET_GROUPS).join ' '
 
       condition { bundle_installed? gemfile }
 
-      sh "bundle install --without #{groups} #{gemfile}"
+      sh "bundle install --without #{without_groups} #{gemfile}"
     end
 
     define_macro :app_init do |path, dirs: [], files: {}|
