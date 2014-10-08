@@ -19,42 +19,73 @@ module Producer
     BUNDLER_UNSET_GROUPS  = %w[development test].freeze
 
     define_macro :deploy do
-      app_path      = get :app_path
-      bundler_unset = (get :bundler_unset rescue []) + BUNDLER_UNSET_GROUPS
+      app_path = get :app_path
 
       if ENV.key? 'DEPLOY_INIT'
-        ensure_dir      app_path, 0701
-        git_clone       get(:repository), app_path
-        app_init        app_path,
-          dirs:   (get :app_mkdir rescue []),
-          files:  (get :app_mkfile rescue [])
-        db_config       app_path
-        bundle_install  app_path, bundler_unset
-        db_init         app_path
-        secrets_init    app_path
-        www_config      app_path
+        deploy_init app_path
       else
-        git_update      app_path
-        bundle_install  app_path, bundler_unset
-        db_migrate      app_path
-        db_seed         app_path if (get :db_seed rescue false)
+        deploy_update app_path
       end
 
       assets_update app_path
 
-
       www_pid_path  = (get :www_pid_path rescue WWW_PID_PATH)
       queue_workers = (get :queue_workers rescue nil)
 
+      deploy_restart
+    end
+
+    define_macro :deploy_init do |app_path = get(:app_path)|
+      app_path ||= get :app_path
+
+      ensure_dir      app_path, 0701
+      git_clone       get(:repository), app_path
+      app_init        app_path,
+        dirs:   (get :app_mkdir rescue []),
+        files:  (get :app_mkfile rescue [])
+      db_config       app_path
+      bundle_install  app_path, (get :bundler_unset rescue []) + BUNDLER_UNSET_GROUPS
+      db_init         app_path
+      secrets_init    app_path
+      www_config      app_path
+    end
+
+    define_macro :deploy_update do |app_path = nil|
+      app_path ||= get :app_path
+
+      git_update      app_path
+      bundle_install  app_path
+      db_migrate      app_path
+      db_seed         app_path if (get :db_seed rescue false)
+    end
+
+    define_macro :deploy_restart do |app_path = nil|
+      app_path ||= get :app_path
+
       if ENV.key?('DEPLOY_INIT') || ENV.key?('DEPLOY_START')
-        www_start app_path, www_pid_path
-        app_start app_path, queue_workers if queue_workers
+        deploy_start
       else
-        app_stop if queue_workers
-        www_stop  app_path, www_pid_path
-        www_start app_path, www_pid_path
-        app_start app_path, queue_workers if queue_workers
+        deploy_stop
+        deploy_start
       end
+    end
+
+    define_macro :deploy_stop do
+      app_path      ||= get :app_path
+      www_pid_path  = (get :www_pid_path rescue WWW_PID_PATH)
+      queue_workers = (get :queue_workers rescue nil)
+
+      app_stop if queue_workers
+      www_stop app_path, www_pid_path
+    end
+
+    define_macro :deploy_start do
+      app_path      ||= get :app_path
+      www_pid_path  = (get :www_pid_path rescue WWW_PID_PATH)
+      queue_workers = (get :queue_workers rescue nil)
+
+      www_start app_path, www_pid_path
+      app_start app_path, queue_workers if queue_workers
     end
 
     define_test :bundle_installed? do |gemfile|
