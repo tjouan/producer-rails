@@ -38,7 +38,7 @@ module Producer
     define_macro :deploy_init do |app_path = get(:app_path)|
       app_path ||= get :app_path
 
-      ensure_dir      app_path, 0701
+      ensure_dir      app_path, mode: 0701
       git_clone       get(:repository), app_path
       app_init        app_path,
         dirs:   (get :app_mkdir rescue []),
@@ -111,9 +111,9 @@ module Producer
 
       condition { no_dir? run_dir }
 
-      mkdir run_dir, 0701
-      dirs.each   { |e| mkdir e, 0700 }
-      files.each  { |k, v| file_write k, v, 0600 }
+      mkdir run_dir, mode: 0701
+      dirs.each   { |e| mkdir e, mode: 0700 }
+      files.each  { |k, v| file_write k, v, mode: 0600 }
     end
 
     define_macro :db_config do |path|
