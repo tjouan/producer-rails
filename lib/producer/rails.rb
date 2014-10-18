@@ -29,9 +29,6 @@ module Producer
 
       assets_update app_path
 
-      www_pid_path  = (get :www_pid_path rescue WWW_PID_PATH)
-      queue_workers = (get :queue_workers rescue nil)
-
       deploy_restart
     end
 
@@ -73,19 +70,19 @@ module Producer
     define_macro :deploy_stop do
       app_path      ||= get :app_path
       www_pid_path  = (get :www_pid_path rescue WWW_PID_PATH)
-      queue_workers = (get :queue_workers rescue nil)
+      processes     = (get :processes rescue nil)
 
-      app_stop if queue_workers
+      app_stop if processes
       www_stop app_path, www_pid_path
     end
 
     define_macro :deploy_start do
       app_path      ||= get :app_path
       www_pid_path  = (get :www_pid_path rescue WWW_PID_PATH)
-      queue_workers = (get :queue_workers rescue nil)
+      processes     = (get :processes rescue nil)
 
       www_start app_path, www_pid_path
-      app_start app_path, queue_workers if queue_workers
+      app_start app_path, processes if processes
     end
 
     define_test :bundle_installed? do |gemfile|
@@ -186,10 +183,10 @@ listen            "\#{ENV['HOME']}/#{path}/#{(get :www_sock_path rescue WWW_SOCK
       sh "cd #{path} && find public/assets -type f -exec chmod 644 {} \\;"
     end
 
-    define_macro :app_start do |app_path, queue_workers|
+    define_macro :app_start do |app_path, processes|
       condition { no_sh 'tmux has-session -t app' }
 
-      sh "cd #{app_path} && tmux new -d -s app 'foreman start -c queue=1,worker=#{queue_workers}; zsh'"
+      sh "cd #{app_path} && tmux new -d -s app 'foreman start -c #{processes}; zsh'"
     end
 
     define_macro :app_stop do
