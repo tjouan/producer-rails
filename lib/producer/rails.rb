@@ -38,10 +38,10 @@ module Producer
       ensure_dir      app_path, mode: 0701
       git_clone       get(:repository), app_path
       app_init        app_path,
-        dirs:   (get :app_mkdir rescue []),
-        files:  (get :app_mkfile rescue [])
+        dirs:   (get :app_mkdir, []),
+        files:  (get :app_mkfile, [])
       db_config       app_path
-      bundle_install  app_path, (get :bundler_unset rescue [])
+      bundle_install  app_path, (get :bundler_unset, [])
       db_init         app_path
       secrets_init    app_path
       www_config      app_path
@@ -53,7 +53,7 @@ module Producer
       git_update      app_path
       bundle_install  app_path
       db_migrate      app_path
-      db_seed         app_path if (get :db_seed rescue false)
+      db_seed         app_path if set? :db_seed
     end
 
     define_macro :deploy_restart do |app_path = nil|
@@ -69,8 +69,8 @@ module Producer
 
     define_macro :deploy_stop do
       app_path      ||= get :app_path
-      www_pid_path  = (get :www_pid_path rescue WWW_PID_PATH)
-      processes     = (get :processes rescue nil)
+      www_pid_path  = (get :www_pid_path, WWW_PID_PATH)
+      processes     = (get :processes, nil)
 
       app_stop if processes
       www_stop app_path, www_pid_path
@@ -78,8 +78,8 @@ module Producer
 
     define_macro :deploy_start do
       app_path      ||= get :app_path
-      www_pid_path  = (get :www_pid_path rescue WWW_PID_PATH)
-      processes     = (get :processes rescue nil)
+      www_pid_path  = (get :www_pid_path, WWW_PID_PATH)
+      processes     = (get :processes, nil)
 
       www_start app_path, www_pid_path
       app_start app_path, processes if processes
@@ -162,13 +162,13 @@ production:
     define_macro :www_config do |path|
       www_config_path = File.join(
         path,
-        (get :www_config_path rescue UNICORN_CONF_PATH)
+        (get :www_config_path, UNICORN_CONF_PATH)
       )
       conf = <<-eoh
 worker_processes  #{get :www_workers}
 preload_app       false
 pid               '#{get :www_pid_path}'
-listen            "\#{ENV['HOME']}/#{path}/#{(get :www_sock_path rescue WWW_SOCK_PATH)}"
+listen            "\#{ENV['HOME']}/#{path}/#{(get :www_sock_path, WWW_SOCK_PATH)}"
       eoh
 
       condition { no_file_contains www_config_path, conf }
