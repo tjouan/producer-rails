@@ -54,6 +54,7 @@ module Producer
       bundle_install  app_path
       db_migrate      app_path
       db_seed         app_path if set? :db_seed
+      www_config      app_path
     end
 
     define_macro :deploy_restart do |app_path = nil|
