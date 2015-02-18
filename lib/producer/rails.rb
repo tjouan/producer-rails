@@ -167,6 +167,7 @@ production:
       )
       conf = <<-eoh
 worker_processes  #{get :www_workers}
+timeout           #{get :www_timeout, 60}
 preload_app       false
 pid               '#{get :www_pid_path}'
 listen            "\#{ENV['HOME']}/#{path}/#{(get :www_sock_path, WWW_SOCK_PATH)}"
