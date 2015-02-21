@@ -27,7 +27,7 @@ module Producer
         deploy_update app_path
       end
 
-      assets_update app_path
+      assets_update app_path if set? :assets_update
 
       deploy_restart
     end
@@ -102,7 +102,7 @@ module Producer
 
     define_macro :app_init do |path, dirs: [], files: {}|
       run_dir = "#{path}/tmp/run"
-      dirs << 'public/assets'
+      dirs << 'public/assets' if set? :assets_update
       dirs.map! { |e| File.join(path, e) }
       files = files.each_with_object({}) do |(k, v), m|
         m[File.join(path, k)] = v
