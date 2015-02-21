@@ -15,7 +15,7 @@ module Producer
 
     UNICORN_CONF_PATH     = 'config/unicorn.rb'.freeze
     WWW_PID_PATH          = 'tmp/run/www.pid'.freeze
-    WWW_SOCK_PATH         = 'tmp/run/www.socke'.freeze
+    WWW_SOCK_PATH         = 'tmp/run/www.sock'.freeze
     BUNDLER_UNSET_GROUPS  = %w[development test].freeze
 
     define_macro :deploy do
