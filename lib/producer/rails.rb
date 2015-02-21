@@ -43,6 +43,7 @@ module Producer
       db_config       app_path
       bundle_install  app_path, (get :bundler_unset, [])
       db_init         app_path
+      db_seed         app_path if set? :db_seed
       secrets_init    app_path
       www_config      app_path
     end
