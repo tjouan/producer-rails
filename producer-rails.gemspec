@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.version = Producer::Rails::VERSION.dup
   s.summary = 'producer rails addon'
   s.description = <<-eoh.gsub(/^ +/, '')
-    Rails specific macros for producer (gem: producer-core).
+    Rails helpers for producer (gem: producer-core).
   eoh
   s.homepage = 'https://rubygems.org/gems/producer-rails'
 
