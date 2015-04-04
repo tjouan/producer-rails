@@ -14,6 +14,6 @@ Gem::Specification.new do |s|
 
   s.files = `git ls-files`.split $/
 
-  s.add_dependency 'producer-core',   '~> 0.3', '>= 0.3.5'
-  s.add_dependency 'producer-stdlib', '~> 0.0', '>= 0.0.5'
+  s.add_dependency 'producer-core',   '~> 0.5'
+  s.add_dependency 'producer-stdlib', '~> 0.1'
 end
