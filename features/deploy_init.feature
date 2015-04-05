@@ -1,4 +1,4 @@
-@sshd @sshd_gem_env
+@sshd @sshd_gem_env @mocked_home_directory
 Feature: `deploy_init' macro
 
   Background:
