@@ -15,6 +15,6 @@ Feature: `deploy_init' macro
 
       """
 
-  Scenario: creates remote app dir
+  Scenario: clones the app in configured remote directory
     When I successfully execute the recipe on remote target
-    Then the remote directory "deploys/my_app" must exist
+    Then the remote file "deploys/my_app/config.ru" must exist
