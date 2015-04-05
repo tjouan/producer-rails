@@ -33,3 +33,7 @@ Feature: `deploy_init' macro
         database: some_host_test
 
       """
+
+  Scenario: installs dependencies with bundler
+    When I successfully execute the recipe on remote target
+    Then the remote file "deploys/my_app/Gemfile.lock" must exist
