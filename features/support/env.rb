@@ -21,5 +21,6 @@ Before('@sshd_gem_env') do
   write_file '.ssh/rc', <<-eoh
 export GEM_HOME=#{ENV['GEM_HOME']}
 export PATH=#{ENV['GEM_HOME']}/bin:$PATH
+export RAILS_ENV=production
   eoh
 end
