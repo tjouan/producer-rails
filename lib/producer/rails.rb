@@ -125,12 +125,10 @@ default: &default
 
 production:
   <<: *default
-  database: #{target}
+  database: #{target.sub '.', '_'}
           eoh
 
-      condition { no_file? path }
-
-      file_write path, conf
+      file_write_once path, conf
     end
 
     define_macro :db_init do |path|

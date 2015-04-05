@@ -18,3 +18,18 @@ Feature: `deploy_init' macro
   Scenario: clones the app in configured remote directory
     When I successfully execute the recipe on remote target
     Then the remote file "deploys/my_app/config.ru" must exist
+
+  Scenario: configures the database connection
+    When I successfully execute the recipe on remote target
+    Then the remote file "deploys/my_app/config/database.yml" must contain exactly:
+      """
+      default: &default
+        adapter: postgresql
+        encoding: unicode
+        pool: 5
+
+      production:
+        <<: *default
+        database: some_host_test
+
+      """
