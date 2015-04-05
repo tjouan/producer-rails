@@ -37,3 +37,8 @@ Feature: `deploy_init' macro
   Scenario: installs dependencies with bundler
     When I successfully execute the recipe on remote target
     Then the remote file "deploys/my_app/Gemfile.lock" must exist
+
+  Scenario: executes database migrations
+    Given database does not exist
+    When I successfully execute the recipe on remote target
+    Then database migrations for "deploys/my_app" must be up
