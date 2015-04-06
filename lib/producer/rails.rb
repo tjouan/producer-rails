@@ -31,7 +31,7 @@ module Producer
     end
 
     define_macro :deploy_init do |path = get(:app_path)|
-      ensure_dir      path, mode: 0701
+      ensure_dir      path, mode: 0711
       git_clone       get(:repository), path
       app_init        path,
         dirs:   get(:app_mkdir, []),
