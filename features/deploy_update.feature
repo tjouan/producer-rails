@@ -8,5 +8,5 @@ Feature: `deploy_update' macro
     And I write a deployment recipe calling "deploy_update"
 
   Scenario: updates the deployed app repository
-    When I successfully execute the recipe on remote target
+    When I execute the deployment recipe
     Then the deployed app repository must be up to date

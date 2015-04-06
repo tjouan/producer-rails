@@ -27,6 +27,10 @@ Given /^I make the initial deployment$/ do
   deploy_recipe_run
 end
 
+When /^I execute the deployment recipe$/ do
+  deploy_recipe_run
+end
+
 Then /^the deployed app repository must be cloned$/ do
   in_current_dir do
     expect(`git -C #{@deploy_path} log --oneline -1`)
