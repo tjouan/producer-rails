@@ -18,73 +18,63 @@ module Producer
     WWW_SOCK_PATH         = 'tmp/run/www.sock'.freeze
     BUNDLER_UNSET_GROUPS  = %w[development test].freeze
 
-    define_macro :deploy do
-      app_path = get :app_path
-
+    define_macro :deploy do |path = get(:app_path)|
       if ENV.key? 'DEPLOY_INIT'
-        deploy_init app_path
+        deploy_init path
       else
-        deploy_update app_path
+        deploy_update path
       end
 
-      assets_update app_path if set? :assets_update
+      assets_update path if set? :assets_update
 
       deploy_restart
     end
 
-    define_macro :deploy_init do |app_path = get(:app_path)|
-      app_path ||= get :app_path
-
-      ensure_dir      app_path, mode: 0701
-      git_clone       get(:repository), app_path
-      app_init        app_path,
+    define_macro :deploy_init do |path = get(:app_path)|
+      ensure_dir      path, mode: 0701
+      git_clone       get(:repository), path
+      app_init        path,
         dirs:   (get :app_mkdir, []),
         files:  (get :app_mkfile, [])
-      db_config       app_path
-      bundle_install  app_path, (get :bundler_unset, [])
-      db_init         app_path
-      db_seed         app_path if set? :db_seed
-      secrets_init    app_path
-      www_config      app_path
+      db_config       path
+      bundle_install  path, (get :bundler_unset, [])
+      db_init         path
+      db_seed         path if set? :db_seed
+      secrets_init    path
+      www_config      path
     end
 
-    define_macro :deploy_update do |app_path = nil|
-      app_path ||= get :app_path
-
-      git_update      app_path
-      bundle_install  app_path
-      db_migrate      app_path
-      db_seed         app_path if set? :db_seed
-      www_config      app_path
+    define_macro :deploy_update do |path = get(:app_path)|
+      git_update      path
+      bundle_install  path
+      db_migrate      path
+      db_seed         path if set? :db_seed
+      www_config      path
     end
 
-    define_macro :deploy_restart do |app_path = nil|
-      app_path ||= get :app_path
-
+    define_macro :deploy_restart do |path = get(:app_path)|
       if ENV.key?('DEPLOY_INIT') || ENV.key?('DEPLOY_START')
-        deploy_start
+        deploy_start path
       else
-        deploy_stop
-        deploy_start
+        deploy_stop path
+        deploy_start path
       end
     end
 
-    define_macro :deploy_stop do
-      app_path      ||= get :app_path
+    define_macro :deploy_stop do |path = get(:app_path)|
       www_pid_path  = (get :www_pid_path, WWW_PID_PATH)
       processes     = (get :processes, nil)
 
       app_stop if processes
-      www_stop app_path, www_pid_path
+      www_stop path, www_pid_path
     end
 
-    define_macro :deploy_start do
-      app_path      ||= get :app_path
+    define_macro :deploy_start do |path = get(:app_path)|
       www_pid_path  = (get :www_pid_path, WWW_PID_PATH)
       processes     = (get :processes, nil)
 
-      www_start app_path, www_pid_path
-      app_start app_path, processes if processes
+      www_start path, www_pid_path
+      app_start path, processes if processes
     end
 
     define_test :bundle_installed? do |gemfile|
@@ -148,15 +138,15 @@ production:
     end
 
     define_macro :secrets_init do |path|
-      path = "#{path}/config/secrets.yml"
+      secrets_path = "#{path}/config/secrets.yml"
       conf = <<-eoh
 production:
   secret_key_base: #{SecureRandom.hex(64)}
       eoh
 
-      condition { no_file? path }
+      condition { no_file? secrets_path }
 
-      file_write path, conf
+      file_write secrets_path, conf
     end
 
     define_macro :www_config do |path|
@@ -184,28 +174,28 @@ listen            "\#{ENV['HOME']}/#{path}/#{(get :www_sock_path, WWW_SOCK_PATH)
       sh "cd #{path} && find public/assets -type f -exec chmod 644 {} \\;"
     end
 
-    define_macro :app_start do |app_path, processes|
+    define_macro :app_start do |path, processes|
       condition { no_sh 'tmux has-session -t app' }
 
-      sh "cd #{app_path} && tmux new -d -s app 'foreman start -c #{processes}; zsh'"
+      sh "cd #{path} && tmux new -d -s app 'foreman start -c #{processes}; zsh'"
     end
 
     define_macro :app_stop do
       sh 'tmux kill-session -t app'
     end
 
-    define_macro :www_start do |app_path, www_pid_path|
-      condition { no_file? [app_path, www_pid_path].join('/') }
+    define_macro :www_start do |path, www_pid_path|
+      condition { no_file? [path, www_pid_path].join('/') }
 
-      sh "cd #{app_path} && bundle exec unicorn -c config/unicorn.rb -D"
+      sh "cd #{path} && bundle exec unicorn -c config/unicorn.rb -D"
     end
 
-    define_macro :www_reload do |app_path, www_pid_path|
-      sh "kill -HUP $(cat #{app_path}/#{www_pid_path})"
+    define_macro :www_reload do |path, www_pid_path|
+      sh "kill -HUP $(cat #{path}/#{www_pid_path})"
     end
 
-    define_macro :www_stop do |app_path, www_pid_path|
-      pid_path = [app_path, www_pid_path].join '/'
+    define_macro :www_stop do |path, www_pid_path|
+      pid_path = [path, www_pid_path].join '/'
 
       condition { file? pid_path }
 
