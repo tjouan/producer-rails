@@ -205,9 +205,11 @@ listen            "\#{ENV['HOME']}/#{path}/#{(get :www_sock_path, WWW_SOCK_PATH)
     end
 
     define_macro :www_stop do |app_path, www_pid_path|
-      condition { file? [app_path, www_pid_path].join('/') }
+      pid_path = [app_path, www_pid_path].join '/'
 
-      sh "kill -QUIT $(cat #{app_path}/#{www_pid_path}); sleep 1"
+      condition { file? pid_path }
+
+      sh "kill -QUIT $(cat #{pid_path}); while [ -f #{pid_path} ]; do sleep 0.1; done"
     end
   end
 end
