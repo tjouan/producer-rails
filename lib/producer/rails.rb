@@ -1,8 +1,8 @@
+require 'producer/stdlib'
+require 'securerandom'
+
 module Producer
   module Rails
-    require 'producer/stdlib'
-    require 'securerandom'
-
     class << self
       def define_macro(name, &block)
         ::Producer::Core::Recipe.define_macro(name, block)
