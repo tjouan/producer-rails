@@ -3,7 +3,7 @@ Feature: `deploy_init' macro
 
   Background:
     Given a rails app repository
-    And I write a deployment recipe calling "deploy_init"
+    And I write a standard deployment recipe calling "deploy_init"
 
   Scenario: clones the app in configured remote directory
     When I execute the deployment recipe

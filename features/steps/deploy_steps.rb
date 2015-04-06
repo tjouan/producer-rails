@@ -13,12 +13,16 @@ def deploy_recipe_write(repository, macro)
   eoh
 end
 
-def deploy_recipe_run
-  run_recipe remote: true, check: true
+def deploy_recipe_run(rargv: [])
+  run_recipe remote: true, check: true, rargv: rargv
 end
 
 Given /^I write a deployment recipe calling "([^"]+)"$/ do |macro|
   deploy_recipe_write @repository, macro
+end
+
+Given /^I write a standard deployment recipe$/ do
+  deploy_recipe_write @repository, 'deploy'
 end
 
 Given /^I make the initial deployment$/ do
@@ -39,6 +43,14 @@ end
 
 When /^I execute the deployment recipe$/ do
   deploy_recipe_run
+end
+
+When /^I execute the deployment recipe with "([^"]+)" recipe argument$/ do |arg|
+  deploy_recipe_run rargv: [arg]
+end
+
+Then /^the deployed app must be initialized$/ do
+  step 'the deployed app must have unicorn configuration'
 end
 
 Then /^the deployed app repository must be cloned$/ do

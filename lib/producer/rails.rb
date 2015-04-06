@@ -21,15 +21,13 @@ module Producer
     BUNDLER_UNSET_GROUPS  = %w[development test].freeze
 
     define_macro :deploy do |path = get(:app_path)|
-      if ENV.key? 'DEPLOY_INIT'
-        deploy_init path
-      else
-        deploy_update path
+      case recipe_argv[0]
+      when 'init'     then deploy_init
+      when 'update'   then deploy_update
+      when 'start'    then deploy_start
+      when 'stop'     then deploy_stop
+      when 'restart'  then deploy_restart
       end
-
-      assets_update path if set? :assets_update
-
-      deploy_restart
     end
 
     define_macro :deploy_init do |path = get(:app_path)|
@@ -44,6 +42,7 @@ module Producer
       db_seed         path if set? :db_seed
       secrets_init    path
       www_config      path
+      assets_update   path if set? :assets_update
     end
 
     define_macro :deploy_update do |path = get(:app_path)|
@@ -52,15 +51,12 @@ module Producer
       db_migrate      path
       db_seed         path if set? :db_seed
       www_config      path
+      assets_update   path if set? :assets_update
     end
 
     define_macro :deploy_restart do |path = get(:app_path)|
-      if ENV.key?('DEPLOY_INIT') || ENV.key?('DEPLOY_START')
-        deploy_start path
-      else
-        deploy_stop path
-        deploy_start path
-      end
+      deploy_stop path
+      deploy_start path
     end
 
     define_macro :deploy_stop do |path = get(:app_path)|
