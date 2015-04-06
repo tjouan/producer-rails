@@ -153,17 +153,13 @@ production:
         path,
         get(:www_config_path, UNICORN_CONF_PATH)
       )
-      conf = <<-eoh
+      file_write_once www_config_path, <<-eoh
 worker_processes  #{get :www_workers}
 timeout           #{get :www_timeout, 60}
 preload_app       false
 pid               '#{get :www_pid_path, WWW_PID_PATH}'
 listen            "\#{ENV['HOME']}/#{path}/#{get(:www_sock_path, WWW_SOCK_PATH)}"
       eoh
-
-      condition { no_file_contains www_config_path, conf }
-
-      file_write www_config_path, conf
     end
 
     define_macro :assets_update do |path|
