@@ -32,6 +32,12 @@ Given /^I start the deployed app$/ do
   deploy_recipe_run
 end
 
+Given /^the deployed app unicorn server is running with a certain pid$/ do
+  in_current_dir do
+    @deploy_unicorn_pid = File.read("#{@deploy_path}/tmp/run/www.pid").to_i
+  end
+end
+
 When /^I execute the deployment recipe$/ do
   deploy_recipe_run
 end
@@ -104,4 +110,11 @@ end
 
 Then /^the deployed app unicorn server must not be running$/ do
   check_file_presence "#{@deploy_path}/tmp/run/www.pid", false
+end
+
+Then /^the deployed app unicorn server must have a different pid$/ do
+  in_current_dir do
+    expect(File.read("#{@deploy_path}/tmp/run/www.pid").to_i)
+      .not_to eq @deploy_unicorn_pid
+  end
 end
