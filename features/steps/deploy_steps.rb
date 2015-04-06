@@ -27,6 +27,11 @@ Given /^I make the initial deployment$/ do
   deploy_recipe_run
 end
 
+Given /^I start the deployed app$/ do
+  deploy_recipe_write @repository, 'deploy_start'
+  deploy_recipe_run
+end
+
 When /^I execute the deployment recipe$/ do
   deploy_recipe_run
 end
@@ -92,7 +97,11 @@ Then /^the deployed app unicorn server must be running$/ do
   pid_path = "#{@deploy_path}/tmp/run/www.pid"
   check_file_presence pid_path, true
   in_current_dir do
-    expect { expect(Process.kill 0, File.read(pid_path).to_i).to eq 1 }
+    expect { expect(Process.kill(0, File.read(pid_path).to_i)).to eq 1 }
       .not_to raise_error
   end
+end
+
+Then /^the deployed app unicorn server must not be running$/ do
+  check_file_presence "#{@deploy_path}/tmp/run/www.pid", false
 end
