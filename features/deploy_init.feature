@@ -46,3 +46,15 @@ Feature: `deploy_init' macro
   Scenario: generates a secret key for production
     When I successfully execute the recipe on remote target
     Then secret key for "deploys/my_app" must be set
+
+  Scenario: configures unicorn server
+    When I successfully execute the recipe on remote target
+    Then the remote file "deploys/my_app/config/unicorn.rb" must contain exactly:
+      """
+      worker_processes  2
+      timeout           60
+      preload_app       false
+      pid               'tmp/run/www.pid'
+      listen            "#{ENV['HOME']}/deploys/my_app/tmp/run/www.sock"
+
+      """
