@@ -1,18 +1,23 @@
 Given /^a rails app repository$/ do
   @repository = 'repos/my_app'
+  env = {
+    'BUNDLE_GEMFILE'  => nil,
+    'RUBYLIB'         => nil,
+    'RUBYOPT'         => nil
+  }
   in_current_dir do
     [
       "rails new --database=postgresql --skip-bundle #{@repository} > /dev/null",
       "rm -f #{@repository}/config/secrets.yml",
       "echo gem \\'unicorn\\' >> #{@repository}/Gemfile",
-      "BUNDLE_GEMFILE=#{@repository}/Gemfile bundle install > /dev/null",
-      "cd #{@repository} && BUNDLE_GEMFILE=Gemfile bundle exec rails g model User name:string > /dev/null 2>&1",
+      "cd #{@repository} && bundle install > /dev/null",
+      "cd #{@repository} && bundle exec rails g model User name:string > /dev/null 2>&1",
       "git -C #{@repository} init > /dev/null",
       "git -C #{@repository} config user.email bob@example",
       "git -C #{@repository} config user.name Bob",
       "git -C #{@repository} add . > /dev/null",
       "git -C #{@repository} commit -m 'Add generated rails app' > /dev/null"
-    ].each { |cmd| fail unless system cmd }
+    ].each { |cmd| fail unless with_env(env) { system cmd } }
   end
 end
 
