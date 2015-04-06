@@ -9,6 +9,6 @@ Feature: `deploy_restart' macro
     And I write a deployment recipe calling "deploy_restart"
 
   @unicorn_kill
-  Scenario: stops unicorn server
+  Scenario: restarts unicorn server
     When I execute the deployment recipe
     Then the deployed app unicorn server must have a different pid
