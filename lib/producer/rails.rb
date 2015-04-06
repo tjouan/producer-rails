@@ -62,11 +62,8 @@ module Producer
     end
 
     define_macro :deploy_stop do |path = get(:app_path)|
-      www_pid_path  = get :www_pid_path, WWW_PID_PATH
-      processes     = get :processes, nil
-
-      app_stop if processes
-      www_stop path, www_pid_path
+      app_stop if set? :processes
+      www_stop path, get(:www_pid_path, WWW_PID_PATH)
     end
 
     define_macro :deploy_start do |path = get(:app_path)|
