@@ -42,3 +42,7 @@ Feature: `deploy_init' macro
     Given database does not exist
     When I successfully execute the recipe on remote target
     Then database migrations for "deploys/my_app" must be up
+
+  Scenario: generates a secret key for production
+    When I successfully execute the recipe on remote target
+    Then secret key for "deploys/my_app" must be set
