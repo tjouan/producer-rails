@@ -5,17 +5,7 @@ Feature: `deploy_update' macro
     Given a rails app repository
     And I make the initial deployment
     And I make a change in the rails app repository
-    And a recipe with:
-      """
-      require 'producer/rails'
-
-      set :repository,  'repos/my_app'
-      set :app_path,    'deploys/my_app'
-      set :www_workers, 2
-
-      deploy_update
-
-      """
+    And I write a deployment recipe calling "deploy_update"
 
   Scenario: updates the deployed app repository
     When I successfully execute the recipe on remote target
