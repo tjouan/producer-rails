@@ -2,7 +2,7 @@
 Feature: `deploy_init' macro
 
   Background:
-    Given a rails app repository in remote directory "repos/my_app"
+    Given a rails app repository
     And a recipe with:
       """
       require 'producer/rails'
