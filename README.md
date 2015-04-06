@@ -20,10 +20,10 @@ deploy
 ```
 
 ```
-# Deploy for the first time:
+# Deploy for the first time
 $ producer config/deploy.rb -t host.example -- init
 
-# Deploy updated application (with application restart):
+# Deploy updated application (with application restart)
 $ producer config/deploy.rb -t host.example -- update
 
 # Start application
