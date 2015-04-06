@@ -14,6 +14,7 @@ module Producer
     end
 
     UNICORN_CONF_PATH     = 'config/unicorn.rb'.freeze
+    WWW_WORKERS           = 2
     WWW_PID_PATH          = 'tmp/run/www.pid'.freeze
     WWW_SOCK_PATH         = 'tmp/run/www.sock'.freeze
     BUNDLER_UNSET_GROUPS  = %w[development test].freeze
@@ -148,7 +149,7 @@ production:
         get(:www_config_path, UNICORN_CONF_PATH)
       )
       file_write_once www_config_path, <<-eoh
-worker_processes  #{get :www_workers}
+worker_processes  #{get :www_workers, WWW_WORKERS}
 timeout           #{get :www_timeout, 60}
 preload_app       false
 pid               '#{get :www_pid_path, WWW_PID_PATH}'

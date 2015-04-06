@@ -8,7 +8,6 @@ def deploy_recipe_write(repository, macro)
 
     set :repository,  '#{repository}'
     set :app_path,    '#{@deploy_path}'
-    set :www_workers, 2
 
     #{macro}
   eoh
