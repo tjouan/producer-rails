@@ -24,3 +24,10 @@ export PATH=#{ENV['GEM_HOME']}/bin:$PATH
 export RAILS_ENV=production
   eoh
 end
+
+After('@unicorn_kill') do
+  in_current_dir do
+    pid = File.read("#{@deploy_path}/tmp/run/www.pid").to_i
+    Process.kill('QUIT', pid)
+  end
+end

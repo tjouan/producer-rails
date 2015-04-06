@@ -87,3 +87,12 @@ pid               'tmp/run/www.pid'
 listen            "\#{ENV['HOME']}/#{@deploy_path}/tmp/run/www.sock"
   eoh
 end
+
+Then /^the deployed app unicorn server must be running$/ do
+  pid_path = "#{@deploy_path}/tmp/run/www.pid"
+  check_file_presence pid_path, true
+  in_current_dir do
+    expect { expect(Process.kill 0, File.read(pid_path).to_i).to eq 1 }
+      .not_to raise_error
+  end
+end

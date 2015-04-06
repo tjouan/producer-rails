@@ -4,6 +4,7 @@ Given /^a rails app repository$/ do
     [
       "rails new --database=postgresql --skip-bundle #{@repository} > /dev/null",
       "rm -f #{@repository}/config/secrets.yml",
+      "echo gem \\'unicorn\\' >> #{@repository}/Gemfile",
       "BUNDLE_GEMFILE=#{@repository}/Gemfile bundle install > /dev/null",
       "cd #{@repository} && BUNDLE_GEMFILE=Gemfile bundle exec rails g model User name:string > /dev/null 2>&1",
       "git -C #{@repository} init > /dev/null",
