@@ -1,4 +1,4 @@
-@sshd @sshd_gem_env @mocked_home_directory
+@sshd @sshd_gem_env
 Feature: `deploy_start' macro
 
   Background:
