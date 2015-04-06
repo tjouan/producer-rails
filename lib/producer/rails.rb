@@ -125,7 +125,9 @@ production:
     end
 
     define_macro :db_migrate do |path|
-      condition { sh "cd #{path} && bundle exec rake db:migrate:status | grep -E '^ +down'" }
+      condition do
+        sh "cd #{path} && bundle exec rake db:migrate:status | grep -E '^ +down'"
+      end
 
       sh "cd #{path} && bundle exec rake db:migrate"
     end
