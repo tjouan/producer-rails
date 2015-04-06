@@ -67,11 +67,8 @@ module Producer
     end
 
     define_macro :deploy_start do |path = get(:app_path)|
-      www_pid_path  = get :www_pid_path, WWW_PID_PATH
-      processes     = get :processes, nil
-
-      www_start path, www_pid_path
-      app_start path, processes if processes
+      www_start path, get(:www_pid_path, WWW_PID_PATH)
+      app_start path, get(:processes, nil) if set? :processes
     end
 
     define_test :bundle_installed? do |gemfile|
