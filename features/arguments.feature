@@ -30,6 +30,7 @@ Feature: producer recipe arguments usage
     When I execute the deployment recipe with "stop" recipe argument
     Then the deployed app unicorn server must not be running
 
+  @unicorn_kill
   Scenario: `restart' recipe argument is given
     Given I make the initial deployment
     And I start the deployed app
