@@ -34,10 +34,10 @@ module Producer
       ensure_dir      path, mode: 0701
       git_clone       get(:repository), path
       app_init        path,
-        dirs:   (get :app_mkdir, []),
-        files:  (get :app_mkfile, [])
+        dirs:   get(:app_mkdir, []),
+        files:  get(:app_mkfile, [])
       db_config       path
-      bundle_install  path, (get :bundler_unset, [])
+      bundle_install  path, get(:bundler_unset, [])
       db_init         path
       db_seed         path if set? :db_seed
       secrets_init    path
@@ -62,16 +62,16 @@ module Producer
     end
 
     define_macro :deploy_stop do |path = get(:app_path)|
-      www_pid_path  = (get :www_pid_path, WWW_PID_PATH)
-      processes     = (get :processes, nil)
+      www_pid_path  = get :www_pid_path, WWW_PID_PATH
+      processes     = get :processes, nil
 
       app_stop if processes
       www_stop path, www_pid_path
     end
 
     define_macro :deploy_start do |path = get(:app_path)|
-      www_pid_path  = (get :www_pid_path, WWW_PID_PATH)
-      processes     = (get :processes, nil)
+      www_pid_path  = get :www_pid_path, WWW_PID_PATH
+      processes     = get :processes, nil
 
       www_start path, www_pid_path
       app_start path, processes if processes
@@ -149,14 +149,14 @@ production:
     define_macro :www_config do |path|
       www_config_path = File.join(
         path,
-        (get :www_config_path, UNICORN_CONF_PATH)
+        get(:www_config_path, UNICORN_CONF_PATH)
       )
       conf = <<-eoh
 worker_processes  #{get :www_workers}
 timeout           #{get :www_timeout, 60}
 preload_app       false
 pid               '#{get :www_pid_path, WWW_PID_PATH}'
-listen            "\#{ENV['HOME']}/#{path}/#{(get :www_sock_path, WWW_SOCK_PATH)}"
+listen            "\#{ENV['HOME']}/#{path}/#{get(:www_sock_path, WWW_SOCK_PATH)}"
       eoh
 
       condition { no_file_contains www_config_path, conf }
