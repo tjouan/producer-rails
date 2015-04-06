@@ -18,7 +18,6 @@ Feature: `deploy_init' macro
     Then the deployed app must have its dependencies installed
 
   Scenario: executes database migrations
-    Given database does not exist
     When I execute the deployment recipe
     Then the deployed app must have its database migrations up
 

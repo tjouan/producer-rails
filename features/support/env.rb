@@ -18,3 +18,7 @@ After('@unicorn_kill') do
     Process.kill('QUIT', pid)
   end
 end
+
+Before do
+  system 'dropdb --if-exists some_host_test > /dev/null'
+end

@@ -20,7 +20,13 @@ module Producer
     WWW_SOCK_PATH         = 'tmp/run/www.sock'.freeze
     BUNDLER_UNSET_GROUPS  = %w[development test].freeze
 
+    define_macro :_deploy_registry_setup do
+      set :database, target.sub(?., ?_) unless set? :database
+    end
+
     define_macro :deploy do |path = get(:app_path)|
+      _deploy_registry_setup
+
       case recipe_argv[0]
       when 'init'     then deploy_init
       when 'update'   then deploy_update
@@ -31,6 +37,8 @@ module Producer
     end
 
     define_macro :deploy_init do |path = get(:app_path)|
+      _deploy_registry_setup
+
       ensure_dir      path, mode: 0711
       git_clone       get(:repository), path
       app_init        path,
@@ -46,7 +54,10 @@ module Producer
     end
 
     define_macro :deploy_update do |path = get(:app_path)|
+      _deploy_registry_setup
+
       git_update      path
+      db_config       path
       bundle_install  path
       db_migrate      path
       db_seed         path if set? :db_seed
@@ -106,12 +117,12 @@ default: &default
 
 production:
   <<: *default
-  database: #{target.sub '.', '_'}
+  database: #{get :database}
       eoh
     end
 
     define_macro :db_init do |path|
-      condition { no_sh 'psql -l | grep -E "^ +%s"' % target }
+      condition { no_sh 'psql -l | grep -E "^ +%s"' % get(:database) }
 
       sh "cd #{path} && bundle exec rake db:create db:migrate"
     end
