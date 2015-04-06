@@ -14,7 +14,7 @@ def deploy_recipe_write(repository, macro)
 end
 
 def deploy_recipe_run(rargv: [])
-  run_recipe remote: true, check: true, rargv: rargv
+  run_recipe remote: true, check: true, rargv: rargv, options: '-v'
 end
 
 Given /^I write a deployment recipe calling "([^"]+)"$/ do |macro|
