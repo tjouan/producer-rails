@@ -106,8 +106,7 @@ module Producer
     end
 
     define_macro :db_config do |path|
-      path = "#{path}/config/database.yml"
-      conf = <<-eoh
+      file_write_once "#{path}/config/database.yml", <<-eoh
 default: &default
   adapter: postgresql
   encoding: unicode
@@ -116,9 +115,7 @@ default: &default
 production:
   <<: *default
   database: #{target.sub '.', '_'}
-          eoh
-
-      file_write_once path, conf
+      eoh
     end
 
     define_macro :db_init do |path|
