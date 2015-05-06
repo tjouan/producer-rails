@@ -1,10 +1,5 @@
 Given /^a rails app repository$/ do
   @repository = 'repos/my_app'
-  env = {
-    'BUNDLE_GEMFILE'  => nil,
-    'RUBYLIB'         => nil,
-    'RUBYOPT'         => nil
-  }
   in_current_dir do
     [
       "rails new --database=postgresql --skip-bundle #{@repository} > /dev/null",
@@ -23,7 +18,7 @@ Given /^a rails app repository$/ do
       "git -C #{@repository} config user.name Bob",
       "git -C #{@repository} add . > /dev/null",
       "git -C #{@repository} commit -m 'Add generated rails app' > /dev/null"
-    ].each { |cmd| fail unless with_env(env) { system cmd } }
+    ].each { |cmd| fail unless Bundler.clean_system(cmd) }
   end
 end
 

@@ -84,11 +84,12 @@ Then /^the deployed app must have its dependencies installed$/ do
 end
 
 Then /^the deployed app must have its database migrations up$/ do
-  unset_bundler_env_vars
-  with_env 'RUBYLIB' => nil, 'RAILS_ENV' => 'production' do
-    in_current_dir do
-      expect(`cd #{@deploy_path} && bundle exec rake db:migrate:status`)
-        .to match /up\s+\d+\s+Create users/
+  Bundler.with_clean_env do
+    with_env 'RAILS_ENV' => 'production' do
+      in_current_dir do
+        expect(`cd #{@deploy_path} && bundle exec rake db:migrate:status`)
+          .to match /up\s+\d+\s+Create users/
+      end
     end
   end
 end
