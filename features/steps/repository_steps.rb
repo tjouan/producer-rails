@@ -1,6 +1,6 @@
 Given /^a rails app repository$/ do
   @repository = 'repos/my_app'
-  in_current_dir do
+  cd ?. do
     [
       "rails new --database=postgresql --skip-bundle #{@repository} > /dev/null",
       "rm -f #{@repository}/config/secrets.yml",
@@ -23,7 +23,7 @@ Given /^a rails app repository$/ do
 end
 
 Given /^I make a change in the rails app repository$/ do
-  in_current_dir do
+  cd ?. do
     fail unless system "git -C #{@repository} commit --allow-empty -m 'Make change'"
   end
 end

@@ -33,7 +33,7 @@ export RAILS_ENV=production
 end
 
 After('@unicorn_kill') do
-  in_current_dir do
+  cd ?. do
     pid = File.read("#{@deploy_path}/tmp/run/www.pid").to_i
     Process.kill('QUIT', pid)
   end

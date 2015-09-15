@@ -36,7 +36,7 @@ Given /^I start the deployed app$/ do
 end
 
 Given /^the deployed app unicorn server is running with a certain pid$/ do
-  in_current_dir do
+  cd ?. do
     @deploy_unicorn_pid = File.read("#{@deploy_path}/tmp/run/www.pid").to_i
   end
 end
@@ -54,20 +54,20 @@ Then /^the deployed app must be initialized$/ do
 end
 
 Then /^the deployed app repository must be cloned$/ do
-  in_current_dir do
+  cd ?. do
     expect(`git -C #{@deploy_path} log --oneline -1`)
       .to include 'Add generated rails app'
   end
 end
 
 Then /^the deployed app repository must be up to date$/ do
-  in_current_dir do
+  cd ?. do
     expect(`git -C #{@deploy_path} log --oneline -1`).to include 'Make change'
   end
 end
 
 Then /^the deployed app must have its database connection configured$/ do
-  check_file_content "#{@deploy_path}/config/database.yml", <<-eoh
+  expect("#{@deploy_path}/config/database.yml").to have_file_content <<-eoh
 default: &default
   adapter: postgresql
   encoding: unicode
@@ -80,13 +80,13 @@ production:
 end
 
 Then /^the deployed app must have its dependencies installed$/ do
-  check_file_presence "#{@deploy_path}/Gemfile.lock", true
+  expect("#{@deploy_path}/Gemfile.lock").to be_an_existing_file
 end
 
 Then /^the deployed app must have its database migrations up$/ do
   Bundler.with_clean_env do
-    with_env 'RAILS_ENV' => 'production' do
-      in_current_dir do
+    with_environment 'RAILS_ENV' => 'production' do
+      cd ?. do
         expect(`cd #{@deploy_path} && bundle exec rake db:migrate:status`)
           .to match /up\s+\d+\s+Create users/
       end
@@ -95,14 +95,14 @@ Then /^the deployed app must have its database migrations up$/ do
 end
 
 Then /^the deployed app must have secret key setup$/ do
-  in_current_dir do
+  cd ?. do
     secrets = YAML.load(File.read("#{@deploy_path}/config/secrets.yml"))
     expect(secrets['production']['secret_key_base']).to be
   end
 end
 
 Then /^the deployed app must have unicorn configuration$/ do
-  check_file_content "#{@deploy_path}/config/unicorn.rb", <<-eoh
+  expect("#{@deploy_path}/config/unicorn.rb").to have_file_content <<-eoh
 worker_processes  2
 timeout           60
 preload_app       false
@@ -113,19 +113,19 @@ end
 
 Then /^the deployed app unicorn server must be running$/ do
   pid_path = "#{@deploy_path}/tmp/run/www.pid"
-  check_file_presence pid_path, true
-  in_current_dir do
+  expect(pid_path).to be_an_existing_file
+  cd ?. do
     expect { expect(Process.kill(0, File.read(pid_path).to_i)).to eq 1 }
       .not_to raise_error
   end
 end
 
 Then /^the deployed app unicorn server must not be running$/ do
-  check_file_presence "#{@deploy_path}/tmp/run/www.pid", false
+  expect("#{@deploy_path}/tmp/run/www.pid").not_to be_an_existing_file
 end
 
 Then /^the deployed app unicorn server must have a different pid$/ do
-  in_current_dir do
+  cd ?. do
     expect(File.read("#{@deploy_path}/tmp/run/www.pid").to_i)
       .not_to eq @deploy_unicorn_pid
   end
