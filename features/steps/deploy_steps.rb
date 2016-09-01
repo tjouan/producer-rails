@@ -45,8 +45,8 @@ When /^I execute the deployment recipe$/ do
   deploy_recipe_run
 end
 
-When /^I execute the deployment recipe with "([^"]+)" recipe argument$/ do |arg|
-  deploy_recipe_run rargv: [arg]
+When /^I execute the deployment recipe with "([^"]+)" recipe arguments?$/ do |args|
+  deploy_recipe_run rargv: args.split(' ')
 end
 
 Then /^the deployed app must be initialized$/ do

@@ -27,7 +27,9 @@ module Producer
     define_macro :deploy do |path = get(:app_path)|
       next unless recipe_argv && recipe_argv.any?
       _deploy_registry_setup
-      send :"deploy_#{recipe_argv[0]}"
+      recipe_argv.each do |arg|
+        send :"deploy_#{arg}"
+      end
     end
 
     define_macro :deploy_init do |path = get(:app_path)|

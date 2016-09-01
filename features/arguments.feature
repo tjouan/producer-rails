@@ -38,3 +38,13 @@ Feature: producer recipe arguments usage
     And I write a standard deployment recipe
     When I execute the deployment recipe with "restart" recipe argument
     Then the deployed app unicorn server must have a different pid
+
+  Scenario: multiple arguments are given
+    Given I make the initial deployment
+    And I make a change in the rails app repository
+    And I start the deployed app
+    And the deployed app unicorn server is running with a certain pid
+    And I write a standard deployment recipe
+    When I execute the deployment recipe with "update restart" recipe arguments
+    Then the deployed app repository must be up to date
+    Then the deployed app unicorn server must have a different pid
