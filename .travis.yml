@@ -1,21 +1,49 @@
 sudo: required
-language: ruby
-rvm:
-  - 2.2
-  - 2.1
-  - ruby-head
-  - rbx-2
+dist: trusty
+language: c
+addons:
+  apt:
+    packages:
+      - realpath
+notifications:
+  email:
+    - tj+travis_producer_rails@a13.fr
+  on_success: never
+
+env:
+  - RUBYVER=2.4-stable
+  - RUBYVER=2.3-stable
+  - RUBYVER=2.2-stable
+  - RUBYVER=2.1-stable
+cache:
+  directories:
+    - ${HOME}/.gem/travis
+    - ${HOME}/usr
+  timeout: 3600
+
+before_install:
+  - sudo apt-get --purge remove ruby\*
+  - rm -rf ~/.bash*
+  - unset gem GEM_HOME GEM_PATH RUBYOPT IRBRC
+  - export PATH=/bin:/usr/bin RB=$HOME/usr/bin/ruby
+  - test -x $RB || wget http://ftp.ruby-lang.org/pub/ruby/ruby-${RUBYVER}.tar.xz
+  - test -x $RB || tar xfJ ruby-*.tar.xz
+  - test -x $RB || cd ruby-*
+  - test -x $RB || ./configure --prefix=$HOME/usr --disable-install-doc --with-out-ext=tk
+  - test -x $RB || (make && make install)
+install:
+  - unset gem GEM_HOME GEM_PATH RUBYOPT IRBRC
+  - export GEM_HOME=~/.gem/travis GEM_PATH=~/.gem/travis
+  - export PATH=$GEM_HOME/bin:$HOME/usr/bin:/bin:/usr/bin
+  - cd $TRAVIS_BUILD_DIR
+  - gem install bundler
+  - bundle install
 before_script:
   - ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
   - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
   - chmod 600 ~/.ssh/authorized_keys
   - eval `ssh-agent -s`
   - ssh-add ~/.ssh/id_rsa
-matrix:
-  fast_finish: true
-  allow_failures:
-    - rvm: ruby-head
-    - rvm: rbx-2
-notifications:
-  email:
-    - tj+travis_producer_rails@a13.fr
+  - export RUBYOPT=-I$(realpath lib)
+script:
+  - rake
