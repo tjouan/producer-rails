@@ -2,8 +2,11 @@ Given /^a rails app repository$/ do
   @repository = 'repos/my_app'
   cd ?. do
     [
-      "rails new --database=postgresql --skip-bundle #{@repository} > /dev/null",
+      'rails new --no-rc --database=postgresql --skip-bundle --skip-keeps' \
+        ' --skip-sprockets --skip-spring --skip-javascript --skip-turbolinks' \
+        " --skip-test-unit #{@repository} > /dev/null",
       "rm -f #{@repository}/config/secrets.yml",
+      "sed -i '' -E '/byebug|jbuilder|sdoc|web-console/d' #{@repository}/Gemfile",
       "echo gem \\'unicorn\\' >> #{@repository}/Gemfile",
       "cd #{@repository} && bundle install > /dev/null",
       "cd #{@repository} && bundle exec rails g model User name:string > /dev/null 2>&1",
