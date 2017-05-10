@@ -28,3 +28,7 @@ Feature: `deploy_init' macro
   Scenario: configures unicorn server
     When I execute the deployment recipe
     Then the deployed app must have unicorn configuration
+
+  Scenario: adds read permission for group and other on public files
+    When I execute the deployment recipe
+    Then the deployed app public files must have read permission

@@ -6,8 +6,9 @@ def deploy_recipe_write(repository, macro)
   write_file RECIPE_PATH, <<-eoh
     require 'producer/rails'
 
-    set :repository,  '#{repository}'
-    set :app_path,    '#{@deploy_path}'
+    set :repository,    '#{repository}'
+    set :app_path,      '#{@deploy_path}'
+    set :assets_update, true
 
     #{macro}
   eoh
@@ -128,5 +129,11 @@ Then /^the deployed app unicorn server must have a different pid$/ do
   cd ?. do
     expect(File.read("#{@deploy_path}/tmp/run/www.pid").to_i)
       .not_to eq @deploy_unicorn_pid
+  end
+end
+
+Then /^the deployed app public files must have read permission$/ do
+  cd ?. do
+    expect(stat_mode "#{@deploy_path}/public/some_file.png").to eq "0644"
   end
 end

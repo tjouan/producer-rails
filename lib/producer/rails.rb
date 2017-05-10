@@ -166,6 +166,7 @@ listen            "\#{ENV['HOME']}/#{path}/#{get(:www_sock_path, WWW_SOCK_PATH)}
       sh "cd #{path} && chmod 711 public public/assets"
       sh "cd #{path} && find public/assets -type d -exec chmod 711 {} \\;"
       sh "cd #{path} && find public/assets -type f -exec chmod 644 {} \\;"
+      sh "cd #{path} && chmod 644 public/*.*"
     end
 
     define_macro :app_start do |path, processes|

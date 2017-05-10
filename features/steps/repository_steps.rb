@@ -3,7 +3,7 @@ Given /^a rails app repository$/ do
   cd ?. do
     [
       'rails new --no-rc --database=postgresql --skip-bundle --skip-keeps' \
-        ' --skip-sprockets --skip-spring --skip-javascript --skip-turbolinks' \
+        ' --skip-spring --skip-javascript --skip-turbolinks' \
         " --skip-test-unit #{@repository} > /dev/null",
       "rm -f #{@repository}/config/secrets.yml",
       "sed -i '' -E '/byebug|jbuilder|sdoc|web-console/d' #{@repository}/Gemfile",
@@ -16,6 +16,7 @@ Given /^a rails app repository$/ do
       "echo /log/*.log >> #{@repository}/.gitignore",
       "echo /public/assets/ >> #{@repository}/.gitignore",
       "echo /tmp/ >> #{@repository}/.gitignore",
+      "touch #{@repository}/public/some_file.png",
       "git -C #{@repository} init > /dev/null",
       "git -C #{@repository} config user.email bob@example",
       "git -C #{@repository} config user.name Bob",
