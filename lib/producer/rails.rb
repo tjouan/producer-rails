@@ -155,9 +155,21 @@ production:
       file_write_once www_config_path, <<-eoh
 worker_processes  #{get :www_workers, WWW_WORKERS}
 timeout           #{get :www_timeout, WWW_TIMEOUT}
-preload_app       false
+preload_app       true
 pid               '#{get :www_pid_path, WWW_PID_PATH}'
 listen            "\#{ENV['HOME']}/#{path}/#{get(:www_sock_path, WWW_SOCK_PATH)}"
+
+before_fork do |server, worker|
+  if defined? ActiveRecord::Base
+    ActiveRecord::Base.connection.disconnect!
+  end
+end
+
+after_fork do |server, worker|
+  if defined? ActiveRecord::Base
+    ActiveRecord::Base.establish_connection
+  end
+end
       eoh
     end
 

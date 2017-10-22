@@ -106,9 +106,21 @@ Then /^the deployed app must have unicorn configuration$/ do
   expect("#{@deploy_path}/config/unicorn.rb").to have_file_content <<-eoh
 worker_processes  2
 timeout           60
-preload_app       false
+preload_app       true
 pid               'tmp/run/www.pid'
 listen            "\#{ENV['HOME']}/#{@deploy_path}/tmp/run/www.sock"
+
+before_fork do |server, worker|
+  if defined? ActiveRecord::Base
+    ActiveRecord::Base.connection.disconnect!
+  end
+end
+
+after_fork do |server, worker|
+  if defined? ActiveRecord::Base
+    ActiveRecord::Base.establish_connection
+  end
+end
   eoh
 end
 
